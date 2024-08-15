@@ -35,7 +35,10 @@ const Home = () => {
   return (
     <div className="container mt-4">
       <div className="d-flex justify-content-between align-items-center mb-4">
-        <h1 className="display-4">Books List</h1>
+      <h1 className="display-4 text-center text-primary my-4 py-3 ">
+  Books List
+</h1>
+
         <Link to="/books/create" className="btn btn-primary">
           <MdOutlineAddBox className="me-2" /> Add Book
         </Link>
@@ -45,14 +48,14 @@ const Home = () => {
       ) : (
         <>
           {error && <div className="alert alert-danger">{error}</div>}
-          <table className="table table-striped">
+          <table className="table table-striped table-dark">
             <thead>
               <tr>
-                <th>No</th>
-                <th>Title</th>
-                <th className="d-none d-md-table-cell">Author</th>
-                <th className="d-none d-md-table-cell">Publish Year</th>
-                <th>Operations</th>
+              <th className="d-none d-md-table-cell text-center">No</th>
+                <th className="d-none d-md-table-cell text-center">Title</th>
+                <th className="d-none d-md-table-cell text-center">Author</th>
+                <th className="d-none d-md-table-cell text-center">Publish Year</th>
+                <th className="d-none d-md-table-cell text-center">Operations</th>
               </tr>
             </thead>
             <tbody>
@@ -62,7 +65,7 @@ const Home = () => {
                     <td className="text-center">{index + 1}</td>
                     <td className="text-center">{book.title}</td>
                     <td className="text-center d-none d-md-table-cell">{book.author}</td>
-                    <td className="text-center d-none d-md-table-cell">{book.publishYear}</td>
+                    <td className="text-center d-none d-md-table-cell">{book.publish?.toString()}</td>
                     <td className="text-center">
                       <div className="d-flex justify-content-center gap-2">
                         <Link to={`/books/details/${book._id}`} className="text-success">

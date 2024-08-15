@@ -1,76 +1,104 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { Container, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 import BackButton from "../components/BackButton";
 import Spinner from "../components/spinner";
-import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 const CreateBooks = () => {
   const [title, setTitle] = useState("");
   const [author, setAuthor] = useState("");
   const [publishYear, setPublishYear] = useState("");
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState(""); // Added success state
   const navigate = useNavigate();
 
   const handleSaveBook = () => {
+    if (!title || !author || !publishYear) {
+      setError("Please fill out all fields.");
+      return;
+    }
+
+    const year = parseInt(publishYear, 10);
+    if (isNaN(year) || year < 1000 || year > new Date().getFullYear()) {
+      setError("Please enter a valid publish year.");
+      return;
+    }
+
     const data = {
       title,
       author,
-      publishYear: parseInt(publishYear, 10), // Ensure publishYear is a number
+      publish: year,
     };
+
     setLoading(true);
+    setError("");
+    setSuccess(""); // Clear previous success messages
     axios
       .post("http://localhost:5151/books", data)
       .then(() => {
         setLoading(false);
-        navigate("/");
+        setSuccess("Book details saved successfully!"); // Set success message
+        setTimeout(() => navigate("/"), 2000); // Redirect after 2 seconds
       })
       .catch((error) => {
         setLoading(false);
         console.error("Error details:", error.response || error.message || error);
-        alert("An error happened, please check console");
+        setError("An error occurred while saving the book. Please try again later.");
       });
-     
   };
 
   return (
-    <div className="p-4">
+    <Container className="p-4">
       <BackButton />
-      <h1 className="text-3xl my-4">Create Book</h1>
+      <h1 className="my-4">Create Book</h1>
       {loading && <Spinner />}
-      <div className="flex flex-col border-2 border-sky-400 rounded-xl w-[600px] p-4 mx-auto">
-        <div className="my-4">
-          <label className="text-xl mr-4 text-gray-500">Title</label>
-          <input
-            type="text"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            className="border-2 border-gray-500 px-4 py-2 w-full"
-          />
-        </div>
+      {error && <Alert variant="danger">{error}</Alert>}
+      {success && <Alert variant="success">{success}</Alert>} {/* Success display */}
+      <Row className="justify-content-center">
+        <Col md={8} lg={6}>
+          <div className="border border-primary rounded p-4">
+            <Form>
+              <Form.Group className="mb-3">
+                <Form.Label>Title</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </Form.Group>
 
-        <div className="my-4">
-          <label className="text-xl mr-4 text-gray-500">Author</label>
-          <input
-            type="text"
-            value={author}
-            onChange={(e) => setAuthor(e.target.value)}
-            className="border-2 border-gray-500 px-4 py-2 w-full"
-          />
-        </div>
-        <div className="my-4">
-          <label className="text-xl mr-4 text-gray-500">Publish Year</label>
-          <input
-            type="number"
-            value={publishYear}
-            onChange={(e) => setPublishYear(e.target.value)}
-            className="border-2 border-gray-500 px-4 py-2 w-full"
-          />
-        </div>
-        <button className="p-2 bg-sky-300 m-8" onClick={handleSaveBook}>
-          Save
-        </button>
-      </div>
-    </div>
+              <Form.Group className="mb-3">
+                <Form.Label>Author</Form.Label>
+                <Form.Control
+                  type="text"
+                  value={author}
+                  onChange={(e) => setAuthor(e.target.value)}
+                />
+              </Form.Group>
+
+              <Form.Group className="mb-3">
+                <Form.Label>Publish Year</Form.Label>
+                <Form.Control
+                  type="number"
+                  value={publishYear}
+                  onChange={(e) => setPublishYear(e.target.value)}
+                />
+              </Form.Group>
+
+              <Button 
+                variant="primary" 
+                onClick={handleSaveBook} 
+                disabled={loading}
+              >
+                Save
+              </Button>
+            </Form>
+          </div>
+        </Col>
+      </Row>
+    </Container>
   );
 };
 
